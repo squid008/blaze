@@ -56,7 +56,7 @@ from ..expr import (
     BinOp, UnaryOp, Join, mean, var, std, Reduction, count,
     FloorDiv, UnaryStringFunction, strlen, DateTime, Coerce,
     nunique, Distinct, By, Sort, Head, Label, ReLabel, Merge,
-    common_subexpression, Summary, Like, nelements, Concat,
+    common_subexpression, Summary, Like, nelements, Concat, Apply
 )
 
 from ..expr.broadcast import broadcast_collect
@@ -899,3 +899,8 @@ def compute_up(expr, data, **kwargs):
 @dispatch(Coerce, ColumnElement)
 def compute_up(expr, data, **kwargs):
     return sa.cast(data, dshape_to_alchemy(expr.to)).label(expr._name)
+
+
+@dispatch(Apply, (Table, Select, Selectable, ColumnElement))
+def compute_up(expr, data, **kwargs):
+    return expr.func(data)
