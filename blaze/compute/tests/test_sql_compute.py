@@ -1862,3 +1862,11 @@ def test_shift_on_column(n):
     FROM accounts
     """
     assert normalize(str(result)) == normalize(expected)
+
+
+def test_selection_inner_inputs():
+    result = normalize(str(compute(t[t.id == tdate.id], {t: s, tdate: sdate})))
+    expected = normalize("""
+    select {a}.name, {a}.amount, {a}.id from {a}, {b} where {a}.id = {b}.id
+    """).format(a=s.name, b=sdate.name)
+    assert result == expected
