@@ -48,3 +48,7 @@ Bug Fixes
   have CTEs (:issue:`1278`).
 * Fixed a bug where we couldn't display an empty string identifier
   in interactive mode (:issue:`1279`).
+* Fixed a bug where leaves that only appeared in the predicate of a selection
+  would not be in scope in time to compute the predicate. This would cause whole
+  expressions like ``a[a > b]`` to fail because ``b`` was not in scope
+  (:issue:`1275`).
