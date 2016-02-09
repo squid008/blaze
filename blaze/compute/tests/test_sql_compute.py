@@ -22,7 +22,8 @@ from blaze.compatibility import xfail
 from blaze.compute.sql import compute, select, lower_column, compute_up
 from blaze.expr import (
     symbol, transform, summary, by, sin, join,
-    floor, cos, merge, nunique, mean, sum, count, exp, datetime as bz_datetime
+    floor, cos, merge, nunique, mean, sum, count, exp, datetime as bz_datetime,
+    coalesce,
 )
 from blaze.utils import tmpfile, example, normalize
 
@@ -2034,5 +2035,27 @@ def test_inner_select_with_filter():
         ) as anon_1
         where
             s.a = anon_1.a
+        """,
+    )
+
+
+def test_coalesce():
+    ds = 'var * {a: ?int32}'
+    db = resource('sqlite:///m:memory:::s', dshape=ds)
+    s = symbol('s', ds)
+    t = symbol('s', 'int32')
+
+    assert normalize(compute(coalesce(s.a, t), {s: db, t: 1})) == normalize(
+        """\
+        select
+            coalesce(s.a, 1) as coalesce_1
+        from s
+        """,
+    )
+    assert normalize(compute(coalesce(s.a, 1), {s: db})) == normalize(
+        """\
+        select
+            coalesce(s.a, 1) as a
+        from s
         """,
     )

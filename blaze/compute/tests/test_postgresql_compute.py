@@ -16,7 +16,18 @@ import pandas.util.testing as tm
 
 from datashape import dshape
 from odo import odo, resource, drop, discover
-from blaze import symbol, compute, concat, by, join, sin, cos, radians, atan2
+from blaze import (
+    atan2,
+    by,
+    coalesce,
+    compute,
+    concat,
+    cos,
+    join,
+    radians,
+    sin,
+    symbol,
+)
 from odo.utils import tmpfile
 from blaze import sqrt, transform, Data
 from blaze.utils import example, normalize
@@ -583,3 +594,15 @@ def test_sample(sql):
     result2 = compute(t.sample(frac=0.5), sql)
     s2 = odo(result2, pd.DataFrame)
     assert len(s) == len(s2)
+
+
+def test_coalesce(sqla):
+    t = symbol('t', discover(sqla))
+    assert (
+        odo(compute(coalesce(t.B, -1), {t: sqla}), list) ==
+        [(1,), (1,), (-1,)]
+    )
+    assert (
+        odo(compute(coalesce(t.A, 'z'), {t: sqla}), list) ==
+        [('a',), ('z',), ('c',)]
+    )
