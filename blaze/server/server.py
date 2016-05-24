@@ -11,7 +11,7 @@ from time import time
 from warnings import warn
 import importlib
 
-from datashape import discover, pprint, Mono
+from datashape import discover, pprint
 import flask
 from flask import Blueprint, Flask, request, Response
 from flask.ext.cors import cross_origin
@@ -399,8 +399,6 @@ def to_tree(expr, names=None):
                 for arg in (expr.start, expr.stop, expr.step)
             ],
         }
-    elif isinstance(expr, Mono):
-        return str(expr)
     elif isinstance(expr, _Data):
         return to_tree(symbol(expr._name, expr.dshape), names)
     elif isinstance(expr, Expr):
